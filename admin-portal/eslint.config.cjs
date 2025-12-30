@@ -1,7 +1,56 @@
-const { FlatCompat } = require("@eslint/eslintrc");
+const js = require("@eslint/js");
+const nextPlugin = require("@next/eslint-plugin-next");
+const reactPlugin = require("eslint-plugin-react");
+const reactHooksPlugin = require("eslint-plugin-react-hooks");
+const jsxA11yPlugin = require("eslint-plugin-jsx-a11y");
+const importPlugin = require("eslint-plugin-import");
+const globals = require("globals");
 
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+const nextCoreWebVitals = nextPlugin.configs["core-web-vitals"];
 
-module.exports = [...compat.extends("next/core-web-vitals")];
+module.exports = [
+  js.configs.recommended,
+  {
+    ignores: ["node_modules/**", ".next/**", "dist/**", "coverage/**"],
+  },
+  {
+    files: ["**/*.{js,jsx,ts,tsx}"],
+    languageOptions: {
+      ecmaVersion: "latest",
+      sourceType: "module",
+      parserOptions: {
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+      },
+    },
+    plugins: {
+      "@next/next": nextPlugin,
+      react: reactPlugin,
+      "react-hooks": reactHooksPlugin,
+      "jsx-a11y": jsxA11yPlugin,
+      import: importPlugin,
+    },
+    settings: {
+      react: {
+        version: "detect",
+      },
+      "import/resolver": {
+        node: {
+          extensions: [".js", ".jsx", ".ts", ".tsx"],
+        },
+      },
+    },
+    rules: {
+      ...nextCoreWebVitals.rules,
+      ...reactHooksPlugin.configs.recommended.rules,
+      ...jsxA11yPlugin.configs.recommended.rules,
+      ...importPlugin.configs.recommended.rules,
+      "react/react-in-jsx-scope": "off",
+    },
+  },
+];
