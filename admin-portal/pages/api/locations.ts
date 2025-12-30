@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../lib/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -70,9 +68,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error fetching locations:', error);
       res.status(500).json({ message: 'Error fetching locations' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'POST') {
     // Create a new location
     try {
@@ -159,9 +154,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error creating location:', error);
       res.status(500).json({ message: 'Error creating location' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'DELETE') {
     // Delete locations (with optional filters)
     try {
@@ -201,9 +193,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error deleting locations:', error);
       res.status(500).json({ message: 'Error deleting locations' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else {
     res.status(405).json({ message: 'Method not allowed' });
   }
@@ -211,8 +200,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
 // Helper function to check for fence crossings
 async function checkFenceCrossings(location: any, animalId: string) {
-  const prisma = new PrismaClient();
-  
   try {
     // Get all active fences
     const fences = await prisma.fence.findMany({
@@ -272,8 +259,6 @@ async function checkFenceCrossings(location: any, animalId: string) {
     }
   } catch (error) {
     console.error('Error checking fence crossings:', error);
-  } finally {
-    await prisma.$disconnect();
   }
 }
 
@@ -291,34 +276,59 @@ function isPointInPolygon(point: { lat: number, lng: number }, polygon: any[]) {
   if (polygon.length === 2) {
     const center = polygon[0];
     const edgePoint = polygon[1];
-    
-    // Calculate distance from center to edge point (radius)
-    const radius = Math.sqrt(
-      Math.pow(center.lat - edgePoint.lat, 2) + 
-      Math.pow(center.lng - edgePoint.lng, 2)
+
+    const radius = haversineDistanceMeters(
+      { lat: center.lat, lng: center.lng },
+      { lat: edgePoint.lat, lng: edgePoint.lng }
     );
-    
-    // Calculate distance from center to current point
-    const distance = Math.sqrt(
-      Math.pow(center.lat - lat, 2) + 
-      Math.pow(center.lng - lng, 2)
+    const distance = haversineDistanceMeters(
+      { lat: center.lat, lng: center.lng },
+      { lat, lng }
     );
-    
+
     return distance <= radius;
   }
   
   // For polygon fences
+  const earthRadiusMeters = 6371000;
+  const referenceLat = toRadians(lat);
+  const pointXY = {
+    x: earthRadiusMeters * toRadians(lng) * Math.cos(referenceLat),
+    y: earthRadiusMeters * toRadians(lat),
+  };
+
   let inside = false;
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i].lat;
-    const yi = polygon[i].lng;
-    const xj = polygon[j].lat;
-    const yj = polygon[j].lng;
-    
-    const intersect = ((yi > lat) !== (yj > lat))
-      && (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+    const xi = earthRadiusMeters * toRadians(polygon[i].lng) * Math.cos(referenceLat);
+    const yi = earthRadiusMeters * toRadians(polygon[i].lat);
+    const xj = earthRadiusMeters * toRadians(polygon[j].lng) * Math.cos(referenceLat);
+    const yj = earthRadiusMeters * toRadians(polygon[j].lat);
+
+    const intersect = ((yi > pointXY.y) !== (yj > pointXY.y))
+      && (pointXY.x < (xj - xi) * (pointXY.y - yi) / (yj - yi) + xi);
     if (intersect) inside = !inside;
   }
   
   return inside;
+}
+
+function haversineDistanceMeters(
+  start: { lat: number; lng: number },
+  end: { lat: number; lng: number }
+) {
+  const earthRadiusMeters = 6371000;
+  const deltaLat = toRadians(end.lat - start.lat);
+  const deltaLng = toRadians(end.lng - start.lng);
+  const startLat = toRadians(start.lat);
+  const endLat = toRadians(end.lat);
+
+  const a = Math.sin(deltaLat / 2) ** 2
+    + Math.cos(startLat) * Math.cos(endLat) * Math.sin(deltaLng / 2) ** 2;
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+  return earthRadiusMeters * c;
+}
+
+function toRadians(value: number) {
+  return (value * Math.PI) / 180;
 }

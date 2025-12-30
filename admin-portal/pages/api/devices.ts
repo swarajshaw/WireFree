@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../lib/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -81,9 +79,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error fetching devices:', error);
       res.status(500).json({ message: 'Error fetching devices' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'POST') {
     // Create a new device
     try {
@@ -171,9 +166,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error creating device:', error);
       res.status(500).json({ message: 'Error creating device' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'PUT') {
     // Update a device
     try {
@@ -252,9 +244,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error updating device:', error);
       res.status(500).json({ message: 'Error updating device' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'DELETE') {
     // Delete a device
     try {
@@ -272,9 +261,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error deleting device:', error);
       res.status(500).json({ message: 'Error deleting device' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else {
     res.status(405).json({ message: 'Method not allowed' });
   }

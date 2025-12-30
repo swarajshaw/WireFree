@@ -209,6 +209,9 @@ const InteractiveMapView: React.FC<MapProps> = ({
 
     // Cleanup function
     return () => {
+      if (typeof window !== 'undefined') {
+        delete (window as any).initInteractiveMap;
+      }
       if (mapContainer) {
         // Remove the map when component unmounts
         // Clear all child elements (this removes the map)

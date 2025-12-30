@@ -16,7 +16,7 @@ Before installing the WireFree Admin Portal, ensure you have the following prere
 
 ```bash
 git clone https://github.com/swarajshaw/WireFree.git
-cd wirefree-admin-portal
+cd WireFree/admin-portal
 ```
 
 ### 2. Install Dependencies

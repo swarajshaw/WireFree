@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../lib/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -105,9 +103,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error fetching alerts:', error);
       res.status(500).json({ message: 'Error fetching alerts' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'POST') {
     // Create a new alert
     try {
@@ -241,9 +236,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error creating alert:', error);
       res.status(500).json({ message: 'Error creating alert' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'PUT') {
     // Update an alert (typically to resolve it)
     try {
@@ -316,9 +308,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error updating alert:', error);
       res.status(500).json({ message: 'Error updating alert' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'DELETE') {
     // Delete an alert
     try {
@@ -336,9 +325,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error deleting alert:', error);
       res.status(500).json({ message: 'Error deleting alert' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else {
     res.status(405).json({ message: 'Method not allowed' });
   }

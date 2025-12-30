@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { PrismaClient } from '@prisma/client';
-
-const prisma = new PrismaClient();
+import prisma from '../../lib/db';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'GET') {
@@ -60,9 +58,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error fetching animals:', error);
       res.status(500).json({ message: 'Error fetching animals' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'POST') {
     // Create a new animal
     try {
@@ -142,9 +137,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error creating animal:', error);
       res.status(500).json({ message: 'Error creating animal' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'PUT') {
     // Update an animal
     try {
@@ -204,9 +196,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error updating animal:', error);
       res.status(500).json({ message: 'Error updating animal' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else if (req.method === 'DELETE') {
     // Delete an animal
     try {
@@ -239,9 +228,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error deleting animal:', error);
       res.status(500).json({ message: 'Error deleting animal' });
-    } finally {
-      await prisma.$disconnect();
-    }
   } else {
     res.status(405).json({ message: 'Method not allowed' });
   }

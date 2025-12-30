@@ -16,6 +16,7 @@ export function getAuthUser(req: NextApiRequest): AuthUser | null {
   const token = authHeader.slice('Bearer '.length).trim()
   const secret = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET
   if (!secret) {
+    console.error('JWT_SECRET or NEXTAUTH_SECRET is not set. Authentication will fail.')
     return null
   }
 
@@ -29,7 +30,8 @@ export function getAuthUser(req: NextApiRequest): AuthUser | null {
       email: typeof payload.email === 'string' ? payload.email : '',
       role: typeof payload.role === 'string' ? payload.role : undefined,
     }
-  } catch {
+  } catch (error) {
+    console.error('JWT verification failed:', error)
     return null
   }
 }
