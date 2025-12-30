@@ -1,0 +1,97 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.log
+.git/modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Testing
+coverage/
+.pytest_cache/
+.mypy_cache/
+htmlcov/
+.hypothesis/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+.env.dev
+.env.prod
+
+# Build outputs
+dist/
+build/
+*.min.js
+*.min.css
+target/
+out/
+.next/
+
+# Mobile app
+ios/
+android/
+platforms/
+plugins/
+resources/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Temporary folders
+tmp/
+temp/
+
+# App-specific
+app/build/
+*.apk
+*.aab
+*.ipa
+
+# Database
+*.db
+*.db-journal
+
+# Secrets
+secrets/
+config/secrets.json
+*.key
+*.pem

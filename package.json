@@ -1,0 +1,31 @@
+{
+  "name": "wirefree",
+  "version": "1.0.0",
+  "description": "WireFree - Virtual Fencing Platform for Livestock Management",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "docs": "echo \"Documentation available in docs/ directory\"",
+    "start": "echo \"WireFree platform - See docs/MVP_PLAN.md for implementation details\"",
+    "dev": "echo \"Development mode - See docs/MOBILE_ARCHITECTURE.md and docs/BACKEND_ARCHITECTURE.md for architecture details\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/swarajshaw/WireFree.git"
+  },
+ "keywords": [
+    "virtual-fencing",
+    "livestock",
+    "agriculture",
+    "iot",
+    "tracking",
+    "airtag",
+    "tile"
+  ],
+  "author": "WireFree Team",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/swarajshaw/WireFree/issues"
+  },
+  "homepage": "https://github.com/swarajshaw/WireFree#readme"
+}

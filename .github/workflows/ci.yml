@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+
+jobs:
+  admin-portal:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: wirefree
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d wirefree"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+    env:
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5432/wirefree?schema=public
+      NEXTAUTH_URL: http://localhost:6001
+      NEXTAUTH_SECRET: ci-secret
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: admin-portal/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: admin-portal
+
+      - name: Lint
+        run: npm run lint
+        working-directory: admin-portal
+
+      - name: Test
+        run: npm test
+        working-directory: admin-portal
+
+      - name: Prisma format
+        run: npx prisma format
+        working-directory: admin-portal
+
+      - name: Prisma validate
+        run: npx prisma validate
+        working-directory: admin-portal
+
+      - name: Prisma db push
+        run: npx prisma db push
+        working-directory: admin-portal
+
+      - name: Build
+        run: npm run build
+        working-directory: admin-portal
+
+  ios-build:
+    runs-on: macos-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check iOS project
+        id: ios_dir
+        run: |
+          if [ -f "mobile/ios/Podfile" ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Install CocoaPods
+        if: ${{ steps.ios_dir.outputs.exists == 'true' }}
+        run: sudo gem install cocoapods
+
+      - name: Install pods
+        if: ${{ steps.ios_dir.outputs.exists == 'true' }}
+        run: pod install
+        working-directory: mobile/ios
+
+      - name: Build iOS app
+        if: ${{ steps.ios_dir.outputs.exists == 'true' }}
+        run: >
+          xcodebuild
+          -workspace WireFree.xcworkspace
+          -scheme WireFree
+          -configuration Debug
+          -sdk iphonesimulator
+          -destination "platform=iOS Simulator,name=iPhone 15"
+          build
+        working-directory: mobile/ios
+
+      - name: Skip iOS build (missing project)
+        if: ${{ steps.ios_dir.outputs.exists != 'true' }}
+        run: echo "mobile/ios/Podfile not found; skipping iOS build."
