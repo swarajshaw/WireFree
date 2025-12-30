@@ -58,6 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error fetching animals:', error);
       res.status(500).json({ message: 'Error fetching animals' });
+    }
   } else if (req.method === 'POST') {
     // Create a new animal
     try {
@@ -137,6 +138,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error creating animal:', error);
       res.status(500).json({ message: 'Error creating animal' });
+    }
   } else if (req.method === 'PUT') {
     // Update an animal
     try {
@@ -196,6 +198,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error updating animal:', error);
       res.status(500).json({ message: 'Error updating animal' });
+    }
   } else if (req.method === 'DELETE') {
     // Delete an animal
     try {
@@ -228,6 +231,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     } catch (error) {
       console.error('Error deleting animal:', error);
       res.status(500).json({ message: 'Error deleting animal' });
+    }
   } else {
     res.status(405).json({ message: 'Method not allowed' });
   }
