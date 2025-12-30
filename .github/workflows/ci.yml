@@ -58,7 +58,7 @@ jobs:
         working-directory: admin-portal
 
       - name: Prisma db push
-        run: npx prisma db push --skip-generate
+        run: npx prisma db push
         working-directory: admin-portal
 
       - name: Build
