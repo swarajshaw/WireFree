@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Head from 'next/head';
 
 interface SimpleMapProps {
   center?: { lat: number; lng: number };

@@ -1,5 +1,5 @@
 import type { NextApiRequest } from 'next'
-import jwt from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'
 
 export type AuthUser = {
   id: string

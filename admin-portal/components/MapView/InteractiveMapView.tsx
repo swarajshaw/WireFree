@@ -1,20 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { v4 as uuidv4 } from 'uuid';
 
-// Define types for Google Maps API
-type GoogleMap = google.maps.Map;
-type GoogleMarker = google.maps.Marker;
-type GoogleCircle = google.maps.Circle;
-type GooglePolygon = google.maps.Polygon;
-type GoogleDrawingManager = google.maps.drawing.DrawingManager;
-
 interface MapProps {
   center?: { lat: number; lng: number };
   zoom?: number;
   fences?: any[];
   locations?: any[];
   devices?: any[];
-  onFenceCreated?: (fence: any) => void;
+  // eslint-disable-next-line no-unused-vars
+  onFenceCreated?: (fenceData: any) => void;
 }
 
 const InteractiveMapView: React.FC<MapProps> = ({ 
@@ -29,40 +23,40 @@ const InteractiveMapView: React.FC<MapProps> = ({
   const [mapLoaded, setMapLoaded] = useState(false);
   
   // Load Google Maps API dynamically
-  useEffect(() => {
-    const loadGoogleMaps = async () => {
-      if (!mapRef.current) return;
+    useEffect(() => {
+      const loadGoogleMaps = async () => {
+        if (!mapRef.current) return;
+        
+        // Check if Google Maps API is already loaded
+        if (typeof window !== 'undefined' && window.google && window.google.maps) {
+          initMap();
+          return;
+        }
+        
+        // Create callback function to initialize the map
+        (window as any).initInteractiveMap = initMap;
+        
+        // Dynamically load Google Maps API script
+        const script = document.createElement('script');
+        script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=geometry,drawing&callback=initInteractiveMap`;
+        script.async = true;
+        script.defer = true;
+        
+        document.head.appendChild(script);
+      };
       
-      // Check if Google Maps API is already loaded
-      if (typeof window !== 'undefined' && window.google && window.google.maps) {
-        initMap();
-        return;
-      }
-      
-      // Create callback function to initialize the map
-      (window as any).initInteractiveMap = initMap;
-      
-      // Dynamically load Google Maps API script
-      const script = document.createElement('script');
-      script.src = `https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=geometry,drawing&callback=initInteractiveMap`;
-      script.async = true;
-      script.defer = true;
-      
-      document.head.appendChild(script);
-    };
-    
-    const initMap = () => {
-      if (!mapRef.current) return;
-      
-      const map = new (window as any).google.maps.Map(mapRef.current, {
-        center: center,
-        zoom: zoom,
-        mapTypeId: 'satellite',
-        streetViewControl: false,
-        fullscreenControl: true,
-        zoomControl: true,
-        mapTypeControl: true,
-      });
+      const initMap = () => {
+        if (!mapRef.current) return;
+        
+        const map = new (window as any).google.maps.Map(mapRef.current, {
+          center: center,
+          zoom: zoom,
+          mapTypeId: 'satellite',
+          streetViewControl: false,
+          fullscreenControl: true,
+          zoomControl: true,
+          mapTypeControl: true,
+        });
       
       // Add markers for locations
       locations.forEach(location => {
@@ -210,17 +204,16 @@ const InteractiveMapView: React.FC<MapProps> = ({
     };
     
     loadGoogleMaps();
-    
+
+    const mapContainer = mapRef.current;
+
     // Cleanup function
     return () => {
-      if (mapRef.current) {
+      if (mapContainer) {
         // Remove the map when component unmounts
-        const mapContainer = mapRef.current;
-        if (mapContainer) {
-          // Clear all child elements (this removes the map)
-          while (mapContainer.firstChild) {
-            mapContainer.removeChild(mapContainer.firstChild);
-          }
+        // Clear all child elements (this removes the map)
+        while (mapContainer.firstChild) {
+          mapContainer.removeChild(mapContainer.firstChild);
         }
       }
     };

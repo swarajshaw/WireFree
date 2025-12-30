@@ -16,6 +16,14 @@ module.exports = [
     ignores: ["node_modules/**", ".next/**", "dist/**", "coverage/**"],
   },
   {
+    files: ["**/__tests__/**", "**/*.test.*", "**/*.spec.*"],
+    languageOptions: {
+      globals: {
+        ...globals.jest,
+      },
+    },
+  },
+  {
     files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
       ecmaVersion: "latest",

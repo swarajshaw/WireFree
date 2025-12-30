@@ -1,12 +1,10 @@
 import Head from "next/head";
+import Link from "next/link";
 import { Inter } from "next/font/google";
-import { useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function Home() {
-  const [isLoading, setIsLoading] = useState(false);
-
   return (
     <>
       <Head>
@@ -42,10 +40,9 @@ export default function Home() {
         </div>
 
         <div className="mb-32 grid text-center lg:mb-0 lg:grid-cols-4 lg:text-left">
-          <a
+          <Link
             href="/dashboard"
             className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-            rel="noopener noreferrer"
           >
             <h2 className={`mb-3 text-2xl font-semibold`}>
               Dashboard{" "}
@@ -56,12 +53,11 @@ export default function Home() {
             <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
               View and manage your livestock, fences, and devices.
             </p>
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/animals"
             className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-            rel="noopener noreferrer"
           >
             <h2 className={`mb-3 text-2xl font-semibold`}>
               Animals{" "}
@@ -72,12 +68,11 @@ export default function Home() {
             <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
               Manage your livestock and track their locations.
             </p>
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/fences"
             className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-            rel="noopener noreferrer"
           >
             <h2 className={`mb-3 text-2xl font-semibold`}>
               Fences{" "}
@@ -88,12 +83,11 @@ export default function Home() {
             <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
               Create and manage virtual boundaries for your livestock.
             </p>
-          </a>
+          </Link>
 
-          <a
+          <Link
             href="/devices"
             className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-            rel="noopener noreferrer"
           >
             <h2 className={`mb-3 text-2xl font-semibold`}>
               Devices{" "}
@@ -104,7 +98,7 @@ export default function Home() {
             <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
               Manage tracking devices and monitor their status.
             </p>
-          </a>
+          </Link>
         </div>
       </main>
     </>

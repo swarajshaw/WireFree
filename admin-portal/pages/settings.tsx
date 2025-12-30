@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
@@ -102,8 +103,9 @@ export default function SettingsPage() {
                   
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
+                      <label htmlFor="settings-name" className="block text-sm font-medium text-gray-700 mb-1">Name</label>
                       <input
+                        id="settings-name"
                         type="text"
                         defaultValue="John Doe"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -111,8 +113,9 @@ export default function SettingsPage() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                      <label htmlFor="settings-email" className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                       <input
+                        id="settings-email"
                         type="email"
                         defaultValue="john.doe@example.com"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -120,8 +123,9 @@ export default function SettingsPage() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Role</label>
+                      <label htmlFor="settings-role" className="block text-sm font-medium text-gray-700 mb-1">Role</label>
                       <select
+                        id="settings-role"
                         defaultValue="FARMER"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       >
@@ -146,8 +150,9 @@ export default function SettingsPage() {
                   
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Organization Name</label>
+                      <label htmlFor="settings-org-name" className="block text-sm font-medium text-gray-700 mb-1">Organization Name</label>
                       <input
+                        id="settings-org-name"
                         type="text"
                         defaultValue="My Farm"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -155,8 +160,9 @@ export default function SettingsPage() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                      <label htmlFor="settings-org-description" className="block text-sm font-medium text-gray-700 mb-1">Description</label>
                       <textarea
+                        id="settings-org-description"
                         defaultValue="A family-owned cattle farm specializing in sustainable farming practices."
                         rows={3}
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -164,8 +170,9 @@ export default function SettingsPage() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Farm Size</label>
+                      <label htmlFor="settings-farm-size" className="block text-sm font-medium text-gray-700 mb-1">Farm Size</label>
                       <input
+                        id="settings-farm-size"
                         type="number"
                         defaultValue="50"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
@@ -272,8 +279,9 @@ export default function SettingsPage() {
                   
                   <div className="space-y-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Location Update Interval</label>
+                      <label htmlFor="settings-location-interval" className="block text-sm font-medium text-gray-700 mb-1">Location Update Interval</label>
                       <select
+                        id="settings-location-interval"
                         defaultValue="30"
                         className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                       >
@@ -286,8 +294,9 @@ export default function SettingsPage() {
                     </div>
                     
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Low Battery Threshold</label>
+                      <label htmlFor="settings-low-battery" className="block text-sm font-medium text-gray-700 mb-1">Low Battery Threshold</label>
                       <input
+                        id="settings-low-battery"
                         type="range"
                         min="5"
                         max="30"
@@ -355,7 +364,12 @@ export default function SettingsPage() {
 }
 
 // Toggle Switch Component
-function ToggleSwitch({ enabled, setEnabled }: { enabled: boolean, setEnabled: (enabled: boolean) => void }) {
+type ToggleSwitchProps = {
+  enabled: boolean;
+  setEnabled: Dispatch<SetStateAction<boolean>>;
+};
+
+function ToggleSwitch({ enabled, setEnabled }: ToggleSwitchProps) {
   return (
     <button
       type="button"

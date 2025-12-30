@@ -25,7 +25,7 @@ export default async function handler(
         },
       });
       res.status(200).json({ success: true, data: users });
-    } catch (error) {
+    } catch {
       res.status(500).json({ success: false, error: 'Failed to fetch users' });
     }
   } else if (req.method === 'POST') {
@@ -42,7 +42,7 @@ export default async function handler(
       });
       
       res.status(201).json({ success: true, data: user });
-    } catch (error) {
+    } catch {
       res.status(500).json({ success: false, error: 'Failed to create user' });
     }
   } else {

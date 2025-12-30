@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 // User Types
 export interface User {
   id: string;
