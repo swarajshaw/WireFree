@@ -1,0 +1,290 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id             String        @id @default(cuid())
+  email          String        @unique
+  name           String?
+  password       String?
+  role           UserRole      @default(USER)
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  
+  // Organization relation
+  // Owned organization (one-to-one)
+  ownedOrg       Organization? @relation("OrgOwner")
+  
+  // Relations to other models
+  devices        Device[]      @relation("UserDevices")
+  animals        Animal[]      @relation("UserAnimals")
+  resolvedAlerts Alert[]       @relation("UserResolvedAlerts")
+  orgMemberships OrgUser[]     @relation("UserOrgMemberships")
+  
+  // Reverse relation for fences
+  createdFences  Fence[]       @relation("UserFences")
+}
+
+enum UserRole {
+  ADMIN
+  FARMER
+  USER
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  
+  // Owner relation (one-to-one)
+  owner       User?    @relation("OrgOwner", fields: [ownerId], references: [id], onDelete: SetNull)
+  ownerId     String?  @unique
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations to other models
+  users       OrgUser[] @relation("OrgUsers")
+  devices     Device[]
+  animals     Animal[]
+  fences      Fence[]
+  locations   Location[]
+  alerts      Alert[]
+  analytics   Analytics[]
+}
+
+// Join table for many-to-many relationship between User and Organization
+model OrgUser {
+  id           String       @id @default(cuid())
+  user         User         @relation("UserOrgMemberships", fields: [userId], references: [id], onDelete: Cascade)
+  userId       String
+  organization Organization @relation("OrgUsers", fields: [orgId], references: [id], onDelete: Cascade)
+  orgId        String
+  role         String
+  createdAt    DateTime     @default(now())
+  
+  @@unique([userId, orgId])
+}
+
+model Animal {
+  id              String        @id @default(cuid())
+  name            String
+  animalType      AnimalType
+  breed           String?
+  age             Int?
+  weight          Float?
+  gender          Gender?
+  color           String?
+  healthStatus    String?
+  lastLocation    Location?     @relation("AnimalLastLocation", fields: [lastLocationId], references: [id], onDelete: SetNull)
+  lastLocationId  String?       @unique
+  
+  // Relations
+  device          Device?       @relation("DeviceAnimal", fields: [deviceId], references: [id], onDelete: SetNull)
+  deviceId        String?       @unique
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organizationId  String?
+  user            User?         @relation("UserAnimals", fields: [userId], references: [id], onDelete: SetNull)
+  userId          String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Reverse relations
+  alerts          Alert[]
+  analytics       Analytics[] @relation("AnimalAnalytics")
+  locations       Location[]  @relation("AnimalLocations")
+}
+
+enum AnimalType {
+  CATTLE
+  SHEEP
+  GOAT
+  HORSE
+  PIG
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+model Device {
+  id              String        @id @default(cuid())
+  deviceId        String        @unique // The actual device identifier (e.g., AirTag serial)
+  name            String
+  deviceType      DeviceType
+  status          DeviceStatus  @default(DISCONNECTED)
+  batteryLevel    Int?          // 0-100 percentage
+  firmwareVersion String?       // Firmware version
+  lastSeen        DateTime?
+  lastLocation    Location?     @relation("DeviceLastLocation", fields: [lastLocationId], references: [id], onDelete: SetNull)
+  lastLocationId  String?       @unique
+  
+  // Relations
+  pairedAnimal    Animal?       @relation("DeviceAnimal")
+  organization    Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organizationId  String?
+  user            User?         @relation("UserDevices", fields: [userId], references: [id], onDelete: SetNull)
+  userId          String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  // Reverse relations
+  alerts          Alert[]
+  analytics       Analytics[] @relation("DeviceAnalytics")
+  locations       Location[]  @relation("DeviceLocations")
+}
+
+enum DeviceType {
+  AIRTAG
+  TILE
+  CUSTOM_COLLAR
+  BEACON
+  GPS_COLLAR
+}
+
+enum DeviceStatus {
+  CONNECTED
+  DISCONNECTED
+  LOW_BATTERY
+  OFFLINE
+  MALFUNCTIONING
+  IN_RANGE
+  OUT_OF_RANGE
+}
+
+model Fence {
+  id             String        @id @default(cuid())
+  name           String
+  fenceType      FenceType
+  coordinates    Json          // Array of {lat: float, lng: float}
+  isActive       Boolean       @default(true)
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  
+  // Relations
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organizationId String?
+  user           User?         @relation("UserFences", fields: [userId], references: [id], onDelete: SetNull)
+  userId         String?
+  
+  // Reverse relations
+  alerts         Alert[]
+  locations      Location[]    @relation("FenceLocations")
+  analytics      Analytics[]   @relation("FenceAnalytics")
+}
+
+enum FenceType {
+  GEOFENCE
+  POLYGON
+  CIRCLE
+  CORRIDOR
+}
+
+model Location {
+  id             String        @id @default(cuid())
+  deviceId       String        // Reference to device
+  latitude       Float
+  longitude      Float
+  accuracy       Float?        // Accuracy in meters
+  speed          Float?        // Speed in m/s
+  course         Float?        // Direction in degrees
+  altitude       Float?        // Altitude in meters
+  timestamp      DateTime      @default(now())
+  
+  // Relations
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organizationId String?
+  animal         Animal?       @relation("AnimalLocations", fields: [animalId], references: [id], onDelete: SetNull)
+  animalId       String?
+  device         Device?       @relation("DeviceLocations", fields: [deviceIdRef], references: [id], onDelete: SetNull)
+  deviceIdRef    String?
+  fence          Fence?        @relation("FenceLocations", fields: [fenceId], references: [id], onDelete: SetNull)
+  fenceId        String?
+  lastLocationForAnimal Animal? @relation("AnimalLastLocation")
+  lastLocationForDevice Device? @relation("DeviceLastLocation")
+  
+  // Reverse relations
+  alerts         Alert[]
+}
+
+model Alert {
+  id             String        @id @default(cuid())
+  alertType      AlertType
+  severity       AlertSeverity @default(MEDIUM)
+  message        String
+  isResolved     Boolean       @default(false)
+  resolvedAt     DateTime?
+  
+  // Relations
+  resolvedBy     User?         @relation("UserResolvedAlerts", fields: [resolvedById], references: [id], onDelete: SetNull)
+  resolvedById   String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organizationId String?
+  animal         Animal?       @relation(fields: [animalId], references: [id], onDelete: SetNull)
+  animalId       String?
+  device         Device?       @relation(fields: [deviceId], references: [id], onDelete: SetNull)
+  deviceId       String?
+  fence          Fence?        @relation(fields: [fenceId], references: [id], onDelete: SetNull)
+  fenceId        String?
+  location       Location?     @relation(fields: [locationId], references: [id], onDelete: SetNull)
+  locationId     String?
+}
+
+enum AlertType {
+  FENCE_BREACH
+  PROXIMITY
+  EXIT
+  ENTRY
+  BATTERY_LOW
+  DEVICE_OFFLINE
+  SPEED_ANOMALY
+  STATIONARY
+  OUT_OF_RANGE
+  LOCATION_ACCURACY_LOW
+}
+
+enum AlertSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+model Analytics {
+  id             String        @id @default(cuid())
+  metricType     MetricType
+  metricValue    Float
+  unit           String        // Unit of measurement
+  timestamp      DateTime      @default(now())
+  
+  // Relations
+  organization   Organization? @relation(fields: [organizationId], references: [id], onDelete: SetNull)
+  organizationId String?
+  animal         Animal?       @relation("AnimalAnalytics", fields: [animalId], references: [id], onDelete: SetNull)
+  animalId       String?
+  device         Device?       @relation("DeviceAnalytics", fields: [deviceId], references: [id], onDelete: SetNull)
+  deviceId       String?
+  fence          Fence?        @relation("FenceAnalytics", fields: [fenceId], references: [id], onDelete: SetNull)
+  fenceId        String?
+}
+
+enum MetricType {
+  DISTANCE_TRAVELED
+  AVERAGE_SPEED
+  TIME_IN_FENCE
+  MOVEMENT_PATTERN
+  BATTERY_LEVEL
+  SIGNAL_STRENGTH
+  HEALTH_INDICATOR
+}
