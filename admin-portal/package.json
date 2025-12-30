@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "PORT=6001 next dev",
+    "dev": "PORT=6001 NEXT_DISABLE_TURBOPACK=1 next dev",
     "build": "next build",
     "start": "PORT=6001 next start",
     "lint": "next lint",
