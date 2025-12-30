@@ -62,6 +62,7 @@ build/
 *.min.css
 target/
 out/
+.next/
 
 # Mobile app
 ios/
