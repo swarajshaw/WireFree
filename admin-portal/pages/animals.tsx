@@ -2,9 +2,27 @@ import { useState, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 
+type Animal = {
+  id: string;
+  name: string;
+  animalType: string;
+  breed?: string;
+  age?: number;
+  weight?: number;
+  gender?: string;
+  color?: string;
+  healthStatus?: string;
+  lastLocation?: {
+    latitude: number;
+    longitude: number;
+    timestamp: Date;
+  };
+  deviceId?: string;
+};
+
 export default function AnimalsPage() {
   const router = useRouter();
-  const [animals, setAnimals] = useState([]);
+  const [animals, setAnimals] = useState<Animal[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
