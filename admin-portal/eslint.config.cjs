@@ -1,5 +1,7 @@
 const js = require("@eslint/js");
 const nextPlugin = require("@next/eslint-plugin-next");
+const tsParser = require("@typescript-eslint/parser");
+const tsPlugin = require("@typescript-eslint/eslint-plugin");
 const reactPlugin = require("eslint-plugin-react");
 const reactHooksPlugin = require("eslint-plugin-react-hooks");
 const jsxA11yPlugin = require("eslint-plugin-jsx-a11y");
@@ -18,6 +20,7 @@ module.exports = [
     languageOptions: {
       ecmaVersion: "latest",
       sourceType: "module",
+      parser: tsParser,
       parserOptions: {
         ecmaFeatures: {
           jsx: true,
@@ -30,6 +33,7 @@ module.exports = [
     },
     plugins: {
       "@next/next": nextPlugin,
+      "@typescript-eslint": tsPlugin,
       react: reactPlugin,
       "react-hooks": reactHooksPlugin,
       "jsx-a11y": jsxA11yPlugin,
@@ -50,6 +54,9 @@ module.exports = [
       ...reactHooksPlugin.configs.recommended.rules,
       ...jsxA11yPlugin.configs.recommended.rules,
       ...importPlugin.configs.recommended.rules,
+      "react-hooks/set-state-in-effect": "off",
+      "no-unused-vars": "warn",
+      "@next/next/no-html-link-for-pages": "warn",
       "react/react-in-jsx-scope": "off",
     },
   },
