@@ -24,6 +24,12 @@ module.exports = [
     },
   },
   {
+    files: ["**/next-env.d.ts"],
+    rules: {
+      "import/no-unresolved": "off",
+    },
+  },
+  {
     files: ["**/*.{js,jsx,ts,tsx}"],
     languageOptions: {
       ecmaVersion: "latest",
