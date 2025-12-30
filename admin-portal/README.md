@@ -29,7 +29,7 @@ The WireFree Admin Portal runs on port **6001** by default. When accessing the a
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/your-username/wirefree-admin-portal.git
+   git clone https://github.com/swarajshaw/WireFree.git
    cd wirefree-admin-portal
    ```
 

@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import db from '../../../lib/db'
-import { randomBytes } from 'crypto'
+import bcrypt from 'bcryptjs'
+import jwt from 'jsonwebtoken'
 
 type AuthResponse = {
   token: string
@@ -12,8 +13,12 @@ type AuthResponse = {
   }
 }
 
-function makeToken() {
-  return randomBytes(32).toString('hex')
+function signToken(payload: Record<string, unknown>) {
+  const secret = process.env.JWT_SECRET || process.env.NEXTAUTH_SECRET
+  if (!secret) {
+    throw new Error('JWT secret is not configured')
+  }
+  return jwt.sign(payload, secret, { expiresIn: '7d' })
 }
 
 export default async function handler(
@@ -36,14 +41,20 @@ export default async function handler(
   }
 
   const user = await db.user.findUnique({ where: { email } })
-  if (!user || !user.password || user.password !== password) {
+  if (!user || !user.password) {
+    res.status(401).json({ error: 'Invalid credentials' })
+    return
+  }
+
+  const passwordOk = await bcrypt.compare(password, user.password)
+  if (!passwordOk) {
     res.status(401).json({ error: 'Invalid credentials' })
     return
   }
 
   res.status(200).json({
-    token: makeToken(),
-    refreshToken: makeToken(),
+    token: signToken({ sub: user.id, email: user.email, role: user.role }),
+    refreshToken: signToken({ sub: user.id, type: 'refresh' }),
     user: {
       id: user.id,
       email: user.email,

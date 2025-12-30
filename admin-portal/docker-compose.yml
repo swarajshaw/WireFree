@@ -5,11 +5,13 @@ services:
     build: .
     ports:
       - "6001:6001"
+    env_file:
+      - .env
     environment:
       - PORT=6001
-      - DATABASE_URL=postgresql://wirefree:password@db:5432/wirefree
-      - NEXTAUTH_URL=http://localhost:6001
-      - NEXTAUTH_SECRET=your-secret-key-here
+      - DATABASE_URL=${DATABASE_URL}
+      - NEXTAUTH_URL=${NEXTAUTH_URL}
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET}
     depends_on:
       - db
     volumes:
@@ -20,10 +22,12 @@ services:
   db:
     image: postgres:15
     restart: always
+    env_file:
+      - .env
     environment:
-      POSTGRES_USER: wirefree
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: wirefree
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:

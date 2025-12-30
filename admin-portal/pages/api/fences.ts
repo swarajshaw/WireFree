@@ -1,7 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import prisma from '../../lib/db';
+import { getAuthUser } from '../../lib/auth';
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const user = getAuthUser(req);
+  if (!user) {
+    res.status(401).json({ success: false, error: 'Unauthorized' });
+    return;
+  }
+
   if (req.method === 'GET') {
     try {
       const { organizationId } = req.query;

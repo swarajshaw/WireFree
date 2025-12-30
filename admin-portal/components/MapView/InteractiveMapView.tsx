@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import Head from 'next/head';
+import { v4 as uuidv4 } from 'uuid';
 
 // Define types for Google Maps API
 type GoogleMap = google.maps.Map;
@@ -171,7 +171,7 @@ const InteractiveMapView: React.FC<MapProps> = ({
         
         (window as any).google.maps.event.addListener(drawingManager, 'overlaycomplete', (event: any) => {
           const newFence = {
-            id: Math.random().toString(36).substring(7),
+            id: uuidv4(),
             name: `Fence ${fences.length + 1}`,
             coordinates: [] as { lat: number; lng: number }[],
             fenceType: event.type.toUpperCase(),
@@ -228,12 +228,6 @@ const InteractiveMapView: React.FC<MapProps> = ({
 
   return (
     <div>
-      <Head>
-        <script
-          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=geometry,drawing`}
-          async={false} // We're handling loading in useEffect
-        />
-      </Head>
       <div 
         ref={mapRef} 
         style={{ width: '100%', height: '100vh' }}

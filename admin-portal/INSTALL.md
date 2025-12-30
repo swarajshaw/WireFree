@@ -15,7 +15,7 @@ Before installing the WireFree Admin Portal, ensure you have the following prere
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/wirefree-admin-portal.git
+git clone https://github.com/swarajshaw/WireFree.git
 cd wirefree-admin-portal
 ```
 
@@ -102,7 +102,7 @@ The application will be available at http://localhost:6001
 In a separate terminal, run the database migrations:
 
 ```bash
-docker exec -it admin-portal-app-1 npx prisma db push
+docker-compose exec app npx prisma db push
 ```
 
 ## Testing the iOS App on MacBook M1
