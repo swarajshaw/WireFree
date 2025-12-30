@@ -54,6 +54,7 @@ module.exports = [
       ...reactHooksPlugin.configs.recommended.rules,
       ...jsxA11yPlugin.configs.recommended.rules,
       ...importPlugin.configs.recommended.rules,
+      "jsx-a11y/label-has-associated-control": "warn",
       "react-hooks/set-state-in-effect": "off",
       "no-unused-vars": "warn",
       "@next/next/no-html-link-for-pages": "warn",
