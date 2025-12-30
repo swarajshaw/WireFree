@@ -1,62 +1,50 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import db from '../../../lib/db'
-import { randomBytes } from 'crypto'
+import { NextApiRequest, NextApiResponse } from 'next';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
-type AuthResponse = {
-  token: string
-  refreshToken: string
-  user: {
-    id: string
-    email: string
-    name: string | null
-  }
-}
+const prisma = new PrismaClient();
 
-function makeToken() {
-  return randomBytes(32).toString('hex')
-}
-
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<AuthResponse | { error: string }>
-) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' })
-    return
+    return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  const { email, password, name } = req.body as {
-    email?: string
-    password?: string
-    name?: string
+  const { email, name, password } = req.body;
+
+  if (!email || !name || !password) {
+    return res.status(400).json({ message: 'Missing required fields' });
   }
 
-  if (!email || !password) {
-    res.status(400).json({ error: 'Email and password are required' })
-    return
+  try {
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (existingUser) {
+      return res.status(409).json({ message: 'User already exists' });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create user
+    const user = await prisma.user.create({
+      data: {
+        email,
+        name,
+        password: hashedPassword,
+      },
+    });
+
+    // Return user without password
+    const { password: _, ...userWithoutPassword } = user;
+    
+    res.status(201).json({ user: userWithoutPassword });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  } finally {
+    await prisma.$disconnect();
   }
-
-  const existing = await db.user.findUnique({ where: { email } })
-  if (existing) {
-    res.status(409).json({ error: 'User already exists' })
-    return
-  }
-
-  const user = await db.user.create({
-    data: {
-      email,
-      password,
-      name: name || null,
-    },
-  })
-
-  res.status(201).json({
-    token: makeToken(),
-    refreshToken: makeToken(),
-    user: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-    },
-  })
 }
