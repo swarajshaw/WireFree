@@ -13,7 +13,13 @@ const nextCoreWebVitals = nextPlugin.configs["core-web-vitals"];
 module.exports = [
   js.configs.recommended,
   {
-    ignores: ["node_modules/**", ".next/**", "dist/**", "coverage/**"],
+    ignores: [
+      "node_modules/**",
+      ".next/**",
+      "dist/**",
+      "coverage/**",
+      "**/next-env.d.ts",
+    ],
   },
   {
     files: ["**/__tests__/**", "**/*.test.*", "**/*.spec.*"],
@@ -21,12 +27,6 @@ module.exports = [
       globals: {
         ...globals.jest,
       },
-    },
-  },
-  {
-    files: ["**/next-env.d.ts"],
-    rules: {
-      "import/no-unresolved": "off",
     },
   },
   {
