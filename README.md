@@ -1,5 +1,5 @@
 # WireFree - Virtual Fencing Platform
-
+![Cattle](./assets/cattle.jpeg)
 ## Vision
 WireFree is a revolutionary mobile platform for implementing virtual fences on cattle using cost-effective tracking devices. Our solution leverages existing technology like Apple AirTags to create virtual fencing in areas, providing an affordable alternative to traditional physical fences and expensive proprietary systems.
 
